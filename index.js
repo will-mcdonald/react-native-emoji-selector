@@ -1,77 +1,77 @@
-import React, { Component } from "react";
+import emoji from "emoji-datasource";
+import { Component } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Platform,
   ActivityIndicator,
   AsyncStorage,
-  FlatList
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import emoji from "emoji-datasource";
 
 export const Categories = {
   all: {
     symbol: null,
-    name: "All"
+    name: "All",
   },
   history: {
     symbol: "🕘",
-    name: "Recently used"
+    name: "Recently used",
   },
   emotion: {
     symbol: "😀",
-    name: "Smileys & Emotion"
+    name: "Smileys & Emotion",
   },
   people: {
     symbol: "🧑",
-    name: "People & Body"
+    name: "People & Body",
   },
   nature: {
     symbol: "🦄",
-    name: "Animals & Nature"
+    name: "Animals & Nature",
   },
   food: {
     symbol: "🍔",
-    name: "Food & Drink"
+    name: "Food & Drink",
   },
   activities: {
     symbol: "⚾️",
-    name: "Activities"
+    name: "Activities",
   },
   places: {
     symbol: "✈️",
-    name: "Travel & Places"
+    name: "Travel & Places",
   },
   objects: {
     symbol: "💡",
-    name: "Objects"
+    name: "Objects",
   },
   symbols: {
     symbol: "🔣",
-    name: "Symbols"
+    name: "Symbols",
   },
   flags: {
     symbol: "🏳️‍🌈",
-    name: "Flags"
-  }
+    name: "Flags",
+  },
 };
 
-const charFromUtf16 = utf16 =>
-  String.fromCodePoint(...utf16.split("-").map(u => "0x" + u));
-export const charFromEmojiObject = obj => charFromUtf16(obj.unified);
-const filteredEmojis = emoji.filter(e => !e["obsoleted_by"]);
-const emojiByCategory = category =>
-  filteredEmojis.filter(e => e.category === category);
-const sortEmoji = list => list.sort((a, b) => a.sort_order - b.sort_order);
+const charFromUtf16 = (utf16) =>
+  String.fromCodePoint(...utf16.split("-").map((u) => "0x" + u));
+export const charFromEmojiObject = (obj) => charFromUtf16(obj.unified);
+const filteredEmojis = emoji.filter((e) => !e["obsoleted_by"]);
+const emojiByCategory = (category) =>
+  filteredEmojis.filter((e) => e.category === category);
+const sortEmoji = (list) => list.sort((a, b) => a.sort_order - b.sort_order);
 const categoryKeys = Object.keys(Categories);
 
 const TabBar = ({ theme, activeCategory, onPress, width }) => {
   const tabSize = width / categoryKeys.length;
 
-  return categoryKeys.map(c => {
+  return categoryKeys.map((c) => {
     const category = Categories[c];
     if (c !== "all")
       return (
@@ -84,14 +84,14 @@ const TabBar = ({ theme, activeCategory, onPress, width }) => {
             borderColor: category === activeCategory ? theme : "#EEEEEE",
             borderBottomWidth: 2,
             alignItems: "center",
-            justifyContent: "center"
+            justifyContent: "center",
           }}
         >
           <Text
             style={{
               textAlign: "center",
               paddingBottom: 8,
-              fontSize: Math.max(tabSize - 24, 18)
+              fontSize: Math.max(tabSize - 24, 18),
             }}
           >
             {category.symbol}
@@ -108,7 +108,7 @@ const EmojiCell = ({ emoji, colSize, ...other }) => (
       width: colSize,
       height: colSize,
       alignItems: "center",
-      justifyContent: "center"
+      justifyContent: "center",
     }}
     {...other}
   >
@@ -127,35 +127,35 @@ export default class EmojiSelector extends Component {
     history: [],
     emojiList: null,
     colSize: 0,
-    width: 0
+    width: 0,
   };
 
   //
   //  HANDLER METHODS
   //
-  handleTabSelect = category => {
+  handleTabSelect = (category) => {
     if (this.state.isReady) {
       if (this.scrollview)
         this.scrollview.scrollToOffset({ x: 0, y: 0, animated: false });
       this.setState({
         searchQuery: "",
-        category
+        category,
       });
     }
   };
 
-  handleEmojiSelect = emoji => {
+  handleEmojiSelect = (emoji) => {
     if (this.props.showHistory) {
       this.addToHistoryAsync(emoji);
     }
     this.props.onEmojiSelected(charFromEmojiObject(emoji));
   };
 
-  handleSearch = searchQuery => {
+  handleSearch = (searchQuery) => {
     this.setState({ searchQuery });
   };
 
-  addToHistoryAsync = async emoji => {
+  addToHistoryAsync = async (emoji) => {
     let history = await AsyncStorage.getItem(storage_key);
 
     let value = [];
@@ -165,7 +165,7 @@ export default class EmojiSelector extends Component {
       value.push(record);
     } else {
       let json = JSON.parse(history);
-      if (json.filter(r => r.unified === emoji.unified).length > 0) {
+      if (json.filter((r) => r.unified === emoji.unified).length > 0) {
         value = json;
       } else {
         let record = Object.assign({}, emoji, { count: 1 });
@@ -175,7 +175,7 @@ export default class EmojiSelector extends Component {
 
     AsyncStorage.setItem(storage_key, JSON.stringify(value));
     this.setState({
-      history: value
+      history: value,
     });
   };
 
@@ -201,26 +201,27 @@ export default class EmojiSelector extends Component {
 
   returnSectionData() {
     const { history, emojiList, searchQuery, category } = this.state;
-    let emojiData = (function() {
-        if (category === Categories.all && searchQuery === "") {
+    let emojiData = (function () {
+      if (category === Categories.all && searchQuery === "") {
         //TODO: OPTIMIZE THIS
         let largeList = [];
-        categoryKeys.forEach(c => {
+        categoryKeys.forEach((c) => {
           const name = Categories[c].name;
           const list =
             name === Categories.history.name ? history : emojiList[name];
-          if (c !== "all" && c !== "history") largeList = largeList.concat(list);
+          if (c !== "all" && c !== "history")
+            largeList = largeList.concat(list);
         });
 
-        return largeList.map(emoji => ({ key: emoji.unified, emoji }));
+        return largeList.map((emoji) => ({ key: emoji.unified, emoji }));
       } else {
         let list;
         const hasSearchQuery = searchQuery !== "";
         const name = category.name;
         if (hasSearchQuery) {
-          const filtered = emoji.filter(e => {
+          const filtered = emoji.filter((e) => {
             let display = false;
-            e.short_names.forEach(name => {
+            e.short_names.forEach((name) => {
               if (name.includes(searchQuery.toLowerCase())) display = true;
             });
             return display;
@@ -231,15 +232,17 @@ export default class EmojiSelector extends Component {
         } else {
           list = emojiList[name];
         }
-        return list.map(emoji => ({ key: emoji.unified, emoji }));
+        return list.map((emoji) => ({ key: emoji.unified, emoji }));
       }
-    })()
-    return this.props.shouldInclude ? emojiData.filter(e => this.props.shouldInclude(e.emoji)) : emojiData
+    })();
+    return this.props.shouldInclude
+      ? emojiData.filter((e) => this.props.shouldInclude(e.emoji))
+      : emojiData;
   }
 
   prerenderEmojis(callback) {
     let emojiList = {};
-    categoryKeys.forEach(c => {
+    categoryKeys.forEach((c) => {
       let name = Categories[c].name;
       emojiList[name] = sortEmoji(emojiByCategory(name));
     });
@@ -247,7 +250,7 @@ export default class EmojiSelector extends Component {
     this.setState(
       {
         emojiList,
-        colSize: Math.floor(this.state.width / this.props.columns)
+        colSize: Math.floor(this.state.width / this.props.columns),
       },
       callback
     );
@@ -332,7 +335,7 @@ export default class EmojiSelector extends Component {
                   horizontal={false}
                   numColumns={columns}
                   keyboardShouldPersistTaps={"always"}
-                  ref={scrollview => (this.scrollview = scrollview)}
+                  ref={(scrollview) => (this.scrollview = scrollview)}
                   removeClippedSubviews
                 />
               </View>
@@ -359,29 +362,29 @@ EmojiSelector.defaultProps = {
   showHistory: false,
   showSectionTitles: true,
   columns: 6,
-  placeholder: "Search..."
+  placeholder: "Search...",
 };
 
 const styles = StyleSheet.create({
   frame: {
     flex: 1,
-    width: "100%"
+    width: "100%",
   },
   loader: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   tabBar: {
-    flexDirection: "row"
+    flexDirection: "row",
   },
   scrollview: {
-    flex: 1
+    flex: 1,
   },
   searchbar_container: {
     width: "100%",
     zIndex: 1,
-    backgroundColor: "rgba(255,255,255,0.75)"
+    // backgroundColor: "rgba(255,255,255,0.75)"
   },
   search: {
     ...Platform.select({
@@ -389,21 +392,21 @@ const styles = StyleSheet.create({
         height: 36,
         paddingLeft: 8,
         borderRadius: 10,
-        backgroundColor: "#E5E8E9"
-      }
+        backgroundColor: "#E5E8E9",
+      },
     }),
-    margin: 8
+    margin: 8,
   },
   container: {
     flex: 1,
     flexWrap: "wrap",
     flexDirection: "row",
-    alignItems: "flex-start"
+    alignItems: "flex-start",
   },
   sectionHeader: {
     margin: 8,
     fontSize: 17,
     width: "100%",
-    color: "#8F8F8F"
-  }
+    color: "#8F8F8F",
+  },
 });
