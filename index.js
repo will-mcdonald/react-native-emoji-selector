@@ -81,7 +81,7 @@ const TabBar = ({ theme, activeCategory, onPress, width }) => {
           style={{
             flex: 1,
             height: tabSize,
-            borderColor: category === activeCategory ? theme : "#EEEEEE",
+            // borderColor: category === activeCategory ? theme : "#EEEEEE",
             borderBottomWidth: 2,
             alignItems: "center",
             justifyContent: "center",
@@ -293,7 +293,8 @@ export default class EmojiSelector extends Component {
     const Searchbar = (
       <View style={styles.searchbar_container}>
         <TextInput
-          style={styles.search}
+          style={[styles.search, other?.searchStyle]}
+          placeholderTextColor={other?.placeholderTextColor}
           placeholder={placeholder}
           clearButtonMode="always"
           returnKeyType="done"
@@ -319,16 +320,15 @@ export default class EmojiSelector extends Component {
             />
           )}
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
           {isReady ? (
-            <View style={{ flex: 1 }}>
+            <View style={{ flexShrink: 1 }}>
               <View style={styles.container}>
                 {showSectionTitles && (
                   <Text style={styles.sectionHeader}>{title}</Text>
                 )}
                 <FlatList
                   style={styles.scrollview}
-                  contentContainerStyle={{ paddingBottom: colSize }}
                   data={this.returnSectionData()}
                   renderItem={this.renderEmojiCell}
                   horizontal={false}
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   scrollview: {
-    flex: 1,
+    // flex: 1,
   },
   searchbar_container: {
     width: "100%",
@@ -392,16 +392,16 @@ const styles = StyleSheet.create({
         height: 36,
         paddingLeft: 8,
         borderRadius: 10,
-        backgroundColor: "#E5E8E9",
+        // backgroundColor: "#E5E8E9",
       },
     }),
     margin: 8,
   },
   container: {
-    flex: 1,
     flexWrap: "wrap",
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "flex-start", // from flex-end → better for shrinking
+    justifyContent: "flex-start", // not necessary to push to end
   },
   sectionHeader: {
     margin: 8,
